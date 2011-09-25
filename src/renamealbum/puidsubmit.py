@@ -13,7 +13,7 @@ import musicbrainz2.model as model
 from ConfigParser import NoOptionError
 
 #host="musicbrainz.homeip.net"
-host="musicbrainz.org"
+host="classic.musicbrainz.org"
 clientId = 'albumrenamer-1'
 
 class SubmitFailed(Exception):

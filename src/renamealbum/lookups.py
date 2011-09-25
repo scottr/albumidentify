@@ -25,6 +25,8 @@ WSATTEMPTS=3
 startup = time.time()
 lastwsquery = {}
 
+service = ws.WebService(host='classic.musicbrainz.org')
+
 assert map(int,mb.__version__.split(".")) >= [0,6,0], "Need python-musicbrainz2 >= v0.6.0"
 
 SUBMIT_SUPPORT = map(int, mb.__version__.split(".")) >= [0,7,0]
@@ -163,7 +165,7 @@ if SUBMIT_SUPPORT:
 def get_tracks_by_puid(puid):
 	""" Lookup a list of musicbrainz tracks by PUID. Returns a list of Track
 	objects. """ 
-	q = ws.Query()
+	q = ws.Query(service)
 	filter = ws.TrackFilter(puid=puid)
 	results = []
 	rs = q.getTracks(filter=filter)
@@ -175,7 +177,7 @@ def get_tracks_by_puid(puid):
 @timeout_retry("musicbrainz")
 @delayed("musicbrainz")
 def get_track_by_id(id):
-	q = ws.Query()
+	q = ws.Query(service)
 	results = []
         includes = ws.TrackIncludes(**trackincludes)
 
@@ -187,7 +189,7 @@ def get_track_by_id(id):
 @delayed("musicbrainz")
 def get_release_by_releaseid(releaseid):
 	""" Given a musicbrainz release-id, fetch the release from musicbrainz. """
-	q = ws.Query()
+	q = ws.Query(service)
 	requests = {
 		"artist" 	: True,
 		"counts" 	: True,
@@ -212,7 +214,7 @@ the empty list if there were no matches. """
 
 	if title == "" or performer=="":
 		return []
-	q = ws.Query()
+	q = ws.Query(service)
 	filter = ws.ReleaseFilter(title=title, 
 				artistName=performer)
 	rels = q.getReleases(filter=filter)
@@ -229,7 +231,7 @@ the empty list if there were no matches. """
 @delayed("musicbrainz")
 def get_releases_by_discid(discid):
         """ Given a musicbrainz disc-id, fetch a list of possible releases. """
-        q = ws.Query()
+        q = ws.Query(service)
         filter = ws.ReleaseFilter(discId=discid)
         return q.getReleases(filter=filter)
 
@@ -253,7 +255,7 @@ def get_track_artist_for_track(track):
 	if track.artist is not None:
 		return track.artist
 
-	q = ws.Query()
+	q = ws.Query(service)
 	includes = ws.TrackIncludes(artist = True)
 	t = q.getTrackById(track.id, includes)
 
